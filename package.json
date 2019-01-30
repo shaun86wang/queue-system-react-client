@@ -1,0 +1,40 @@
+{
+  "name": "live-kue-react",
+  "version": "1.0.0",
+  "description": "live-kue client side app built on React",
+  "main": "index.js",
+  "scripts": {
+    "start": "webpack-dev-server --open --mode development",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "npx esw webpack.config.* src",
+    "lint:watch": "npm run lint -- --watch"
+  },
+  "author": "Shaun Wang",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/core": "^7.2.2",
+    "@babel/preset-env": "^7.3.1",
+    "@babel/preset-react": "^7.0.0",
+    "babel-eslint": "^10.0.1",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.0",
+    "eslint": "^5.12.1",
+    "eslint-loader": "^2.1.1",
+    "eslint-plugin-react": "^7.12.4",
+    "eslint-watch": "^4.0.2",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
+    "prop-types": "^15.6.2",
+    "react": "^16.7.0",
+    "react-dom": "^16.7.0",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.29.0",
+    "webpack-cli": "^3.2.1",
+    "webpack-dev-server": "^3.1.14"
+  },
+  "dependencies": {
+    "eslint-config-airbnb": "^17.1.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-jsx-a11y": "^6.2.0"
+  }
+}
