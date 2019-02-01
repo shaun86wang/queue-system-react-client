@@ -1,17 +1,21 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const webpack = require('webpack');
+const path = require('path');
 module.exports = {
-  devServer:{
-    hot:true
+  devServer: {
+    contentBase: './dist',
+    hot: true
   },
   module: {
     rules: [
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader"
-        }
+        use: ['babel-loader', 'eslint-loader',]
+      },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader']
       },
       {
         test: /\.html$/,
@@ -22,21 +26,20 @@ module.exports = {
         ]
       },
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: ['babel-loader', 'eslint-loader',]
-      },
-      {
-        test:/\.css$/,
-        use:['style-loader','css-loader']
-    }
+        test: /\.(png|svg|jpg|gif)$/,
+        use: [
+          'file-loader'
+        ]
+      }
     ]
   },
   plugins: [
     new HtmlWebPackPlugin({
       template: "./src/index.html",
       filename: "./index.html"
-    }),
-    new webpack.HotModuleReplacementPlugin()
-  ]
+    })
+  ],
+  resolve: {
+    modules: ['src', 'node_modules']
+  }
 };
