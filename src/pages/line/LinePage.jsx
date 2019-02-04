@@ -5,12 +5,10 @@ import withStyles from "@material-ui/core/styles/withStyles";
 // @material-ui/icons
 
 // core components
-import Header from "components/Header/Header.jsx";
 import Footer from "components/Footer/Footer.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
 import Button from "components/CustomButtons/Button.jsx";
-import HeaderLinks from "components/Header/HeaderLinks.jsx";
 
 import landingPageStyle from "assets/jss/material-kit-react/views/landingPage.jsx";
 import img from "assets/img/landing-bg.jpg";
@@ -19,17 +17,8 @@ import img from "assets/img/landing-bg.jpg";
 
 class LinePage extends React.Component {
   render() {
-    const { classes, ...rest } = this.props;
+    const { classes} = this.props;
     return (
-      <div>
-        <Header
-          fixed
-          absolute
-          color="transparent"
-          brand="Live Kue"
-          rightLinks={<HeaderLinks />}
-          {...rest}
-        />
         <div className={classes.pageHeader}
           style={{
             backgroundImage: "url(" + img + ")",
@@ -61,7 +50,6 @@ class LinePage extends React.Component {
         <Footer whiteFont/>
         </div>
         
-      </div>
     );
   }
 }

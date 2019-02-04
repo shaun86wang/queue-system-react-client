@@ -6,8 +6,6 @@ import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
 import Email from "@material-ui/icons/Email";
 // core components
-import Header from "components/Header/Header.jsx";
-import HeaderLinks from "components/Header/HeaderLinks.jsx";
 import Footer from "components/Footer/Footer.jsx";
 import GridContainer from "components/Grid/GridContainer.jsx";
 import GridItem from "components/Grid/GridItem.jsx";
@@ -40,16 +38,9 @@ class LoginPage extends React.Component {
     );
   }
   render() {
-    const { classes, ...rest } = this.props;
+    const { classes } = this.props;
     return (
-      <div>
-        <Header
-          absolute
-          color="transparent"
-          brand="Live Kue"
-          rightLinks={<HeaderLinks />}
-          {...rest}
-        />
+
         <div
           className={classes.pageHeader}
           style={{
@@ -113,7 +104,7 @@ class LoginPage extends React.Component {
           </div>
           <Footer whiteFont />
         </div>
-      </div>
+
     );
   }
 }

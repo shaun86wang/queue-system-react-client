@@ -42,14 +42,6 @@ class RegisterPage extends React.Component {
   render() {
     const { classes, ...rest } = this.props;
     return (
-      <div>
-        <Header
-          absolute
-          color="transparent"
-          brand="Live Kue"
-          rightLinks={<HeaderLinks />}
-          {...rest}
-        />
         <div
           className={classes.pageHeader}
           style={{
@@ -180,7 +172,7 @@ class RegisterPage extends React.Component {
           </div>
           <Footer whiteFont />
         </div>
-      </div>
+    
     );
   }
 }
