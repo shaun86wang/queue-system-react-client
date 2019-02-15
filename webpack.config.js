@@ -4,7 +4,8 @@ const path = require('path');
 module.exports = {
   devServer: {
     contentBase: './dist',
-    hot: true
+    hot: true,
+    historyApiFallback: true
   },
   module: {
     rules: [
@@ -40,7 +41,8 @@ module.exports = {
     })
   ],
   resolve: {
-    modules: ['src', 'node_modules']
+    modules: ['src', 'node_modules'],
+    extensions: [".webpack.js", ".web.js", ".js", ".json", ".jsx"]
   },
   externals:{
     config:JSON.stringify({

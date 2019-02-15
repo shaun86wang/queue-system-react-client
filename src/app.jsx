@@ -1,21 +1,18 @@
 import React from "react";
-import { Router, Route, Switch } from "react-router-dom";
+import { Router, Route } from "react-router-dom";
 import { connect } from 'react-redux';
-
+import {StationPage, LoginPage, SignUpPage, LinePage} from './pages'
 import { history } from './helpers';
 
 import { alertActions } from './actions';
 
-import { Header, HeaderLinks, SnackbarContent, ClearFix, Footer } from './components'
+import { Header, HeaderLinks, SnackbarContent, ClearFix, Footer, PrivateRoute} from './components'
 
-import routes from "routes/routes.jsx";
 
 import "assets/scss/material-kit-react.css";
 import { hot } from "react-hot-loader/root";
 import withStyles from "@material-ui/core/styles/withStyles";
 import { container } from "assets/jss/material-kit-react.jsx";
-
-
 
 import img from "assets/img/bg3.jpg";
 
@@ -44,16 +41,17 @@ class App extends React.Component {
           className={classes.pageHeader}
         >
           <div className={classes.container}>
-            <div className={classes.paddingBottom}>
-              {alert.message && <SnackbarContent message={alert.message} close></SnackbarContent>}
-            </div>
+            {alert.message && <div className={classes.paddingBottom}>
+              <SnackbarContent message={alert.message} close color={alert.type} icon={alert.icon}></SnackbarContent>
+            </div>}
             <ClearFix />
             <Router history={history}>
-              <Switch>
-                {routes.map((prop, key) => {
-                  return <Route path={prop.path} key={key} component={prop.component} />;
-                })}
-              </Switch>
+              <div>
+                <Route exact path="/" component={LinePage} />
+                <Route path="/login" component={LoginPage} />
+                <Route path="/signUp" component={SignUpPage} />
+                <PrivateRoute path="/station" component={StationPage} />
+              </div>
             </Router>
             <Footer></Footer>
           </div>
@@ -116,7 +114,7 @@ const style = {
 function mapStateToProps(state) {
   const { alert } = state;
   return {
-      alert
+    alert
   };
 }
 const connectedApp = connect(mapStateToProps)(App);

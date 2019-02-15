@@ -1,15 +1,19 @@
 import { alertConstants } from '../constants';
+import Check from "@material-ui/icons/Check";
+import Warning from "@material-ui/icons/Warning";
 
 export function alert(state = {}, action) {
   switch (action.type) {
     case alertConstants.SUCCESS:
       return {
-        type: 'alert-success',
+        type: 'success',
+        icon: Check,
         message: action.message
       };
     case alertConstants.ERROR:
       return {
-        type: 'alert-danger',
+        type: 'danger',
+        icon: Warning,
         message: action.message
       };
     case alertConstants.CLEAR:

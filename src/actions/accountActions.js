@@ -3,7 +3,7 @@ import { accountService } from '../services';
 import { alertActions } from './';
 import { history } from '../helpers';
 
-export const userActions = {
+export const accountActions = {
     login,
     logout,
     signUp
@@ -17,7 +17,7 @@ function login(username, password) {
             .then(
                 user => { 
                     dispatch(success(user));
-                    history.push('/');
+                    history.push('/station');
                 },
                 error => {
                     dispatch(failure(error.toString()));

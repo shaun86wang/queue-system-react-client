@@ -103,5 +103,5 @@ const style = {
     marginRight: "20px" 
   }
 }
-
-export default withStyles(style)(StationPage);
+const connectedStationPageWithStyle = withStyles(style)(StationPage);
+export {connectedStationPageWithStyle as StationPage}
