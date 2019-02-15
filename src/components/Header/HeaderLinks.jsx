@@ -13,8 +13,7 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { Apps, CloudDownload } from "@material-ui/icons";
 
 // core components
-import CustomDropdown from "components/CustomDropdown/CustomDropdown.jsx";
-import Button from "components/CustomButtons/Button.jsx";
+import {Button} from "../";
 
 import headerLinksStyle from "assets/jss/material-kit-react/components/headerLinksStyle.jsx";
 
@@ -35,5 +34,5 @@ function HeaderLinks({ ...props }) {
     </List>
   );
 }
-
-export default withStyles(headerLinksStyle)(HeaderLinks);
+let headerLinkswithStype = withStyles(headerLinksStyle)(HeaderLinks)
+export {headerLinkswithStype as HeaderLinks} ;

@@ -31,5 +31,5 @@ CardHeader.propTypes = {
   color: PropTypes.oneOf(["warning", "success", "danger", "info", "primary"]),
   plain: PropTypes.bool
 };
-
-export default withStyles(cardHeaderStyle)(CardHeader);
+let cardHeaderWithStyle = withStyles(cardHeaderStyle)(CardHeader);
+export {cardHeaderWithStyle as CardHeader} 

@@ -16,7 +16,7 @@ import Icon from "@material-ui/core/Icon";
 import Popper from "@material-ui/core/Popper";
 
 // core components
-import Button from "components/CustomButtons/Button.jsx";
+import {Button} from "../";
 
 import customDropdownStyle from "../../assets/jss/material-kit-react/components/customDropdownStyle.jsx";
 
@@ -200,5 +200,5 @@ CustomDropdown.propTypes = {
   // function that retuns the selected item
   onClick: PropTypes.func
 };
-
-export default withStyles(customDropdownStyle)(CustomDropdown);
+let customeDropdownWithStyle = withStyles(customDropdownStyle)(CustomDropdown);
+export {customeDropdownWithStyle as CustomDropdown} 

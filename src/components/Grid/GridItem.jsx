@@ -22,5 +22,5 @@ function GridItem({ ...props }) {
     </Grid>
   );
 }
-
-export default withStyles(style)(GridItem);
+let griddItemWithStyle = withStyles(style)(GridItem);
+export {griddItemWithStyle as GridItem} 

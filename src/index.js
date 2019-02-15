@@ -1,19 +1,13 @@
 import ReactDOM from "react-dom";
-import App from 'app.jsx';
 import React from "react";
-import Header from "components/Header/Header.jsx";
-import HeaderLinks from "components/Header/HeaderLinks.jsx";
+import App from 'App.jsx';
+import { Provider } from 'react-redux';
+import { store } from './store';
 
 ReactDOM.render(
-  <div>
-    <Header
-          absolute
-          color="transparent"
-          brand="Live Kue"
-          rightLinks={<HeaderLinks />}
-        />
-  <App></App>
-  </div>
+  <Provider store={store}>
+  <App/>
+  </Provider>
   ,
   document.getElementById("root")
 );

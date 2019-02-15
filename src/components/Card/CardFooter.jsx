@@ -27,5 +27,5 @@ CardFooter.propTypes = {
   classes: PropTypes.object.isRequired,
   className: PropTypes.string
 };
-
-export default withStyles(cardFooterStyle)(CardFooter);
+let cardFooterWithStyle = withStyles(cardFooterStyle)(CardFooter);
+export {cardFooterWithStyle as CardFooter} 

@@ -88,5 +88,5 @@ CustomInput.propTypes = {
   success: PropTypes.bool,
   white: PropTypes.bool
 };
-
-export default withStyles(customInputStyle)(CustomInput);
+let customeInputWithStyle = withStyles(customInputStyle)(CustomInput);
+export {customeInputWithStyle as CustomInput}

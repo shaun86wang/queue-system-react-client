@@ -52,5 +52,5 @@ InfoArea.propTypes = {
   ]),
   vertical: PropTypes.bool
 };
-
-export default withStyles(infoStyle)(InfoArea);
+let infoAreaWithStyle = withStyles(infoStyle)(InfoArea);
+export {infoAreaWithStyle as InfoArea} 

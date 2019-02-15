@@ -74,5 +74,5 @@ Parallax.propTypes = {
   style: PropTypes.string,
   image: PropTypes.string
 };
-
-export default withStyles(parallaxStyle)(Parallax);
+let parallaxWithStyle = withStyles(parallaxStyle)(Parallax);
+export {parallaxWithStyle as Parallax} 

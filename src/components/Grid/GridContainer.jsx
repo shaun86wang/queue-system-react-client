@@ -32,5 +32,5 @@ GridContainer.propTypes = {
   children: PropTypes.node,
   className: PropTypes.string
 };
-
-export default withStyles(style)(GridContainer);
+let gridContainerWithStyle = withStyles(style)(GridContainer);
+export {gridContainerWithStyle as GridContainer} 

@@ -31,5 +31,5 @@ Card.propTypes = {
   plain: PropTypes.bool,
   carousel: PropTypes.bool
 };
-
-export default withStyles(cardStyle)(Card);
+let cardWithStyle = withStyles(cardStyle)(Card);
+export {cardWithStyle as Card}

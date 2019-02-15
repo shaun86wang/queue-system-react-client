@@ -6,17 +6,7 @@ import Icon from "@material-ui/core/Icon";
 // @material-ui/icons
 import Email from "@material-ui/icons/Email";
 // core components
-import Header from "components/Header/Header.jsx";
-import HeaderLinks from "components/Header/HeaderLinks.jsx";
-import Footer from "components/Footer/Footer.jsx";
-import GridContainer from "components/Grid/GridContainer.jsx";
-import GridItem from "components/Grid/GridItem.jsx";
-import Button from "components/CustomButtons/Button.jsx";
-import Card from "components/Card/Card.jsx";
-import CardBody from "components/Card/CardBody.jsx";
-import CardHeader from "components/Card/CardHeader.jsx";
-import CardFooter from "components/Card/CardFooter.jsx";
-import CustomInput from "components/CustomInput/CustomInput.jsx";
+import {Footer, GridContainer, GridItem, Button, Card, CardBody, CardHeader, CardFooter, CustomInput} from '../../components';
 
 import loginPageStyle from "assets/jss/material-kit-react/views/loginPage.jsx";
 import img from "assets/img/bg7.jpg";

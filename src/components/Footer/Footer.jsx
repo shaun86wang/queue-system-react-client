@@ -65,5 +65,5 @@ Footer.propTypes = {
   classes: PropTypes.object.isRequired,
   whiteFont: PropTypes.bool
 };
-
-export default withStyles(footerStyle)(Footer);
+let footerWithStyle = withStyles(footerStyle)(Footer);
+export {footerWithStyle as Footer}

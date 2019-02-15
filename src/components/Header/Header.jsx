@@ -165,4 +165,5 @@ Header.propTypes = {
   })
 };
 
-export default withStyles(headerStyle)(Header);
+const headerWithStyle = withStyles(headerStyle)(Header);
+export {headerWithStyle as Header}

@@ -73,5 +73,5 @@ RegularButton.propTypes = {
   link: PropTypes.bool,
   justIcon: PropTypes.bool
 };
-
-export default withStyles(buttonStyle)(RegularButton);
+let buttonWithStyle = withStyles(buttonStyle)(RegularButton);
+export {buttonWithStyle as Button}

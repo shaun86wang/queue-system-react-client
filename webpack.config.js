@@ -41,5 +41,10 @@ module.exports = {
   ],
   resolve: {
     modules: ['src', 'node_modules']
+  },
+  externals:{
+    config:JSON.stringify({
+      apiUrl: 'http://localhost:5000/api'
+    })
   }
 };

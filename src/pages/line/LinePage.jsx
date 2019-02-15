@@ -5,10 +5,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 // @material-ui/icons
 
 // core components
-import Footer from "components/Footer/Footer.jsx";
-import GridContainer from "components/Grid/GridContainer.jsx";
-import GridItem from "components/Grid/GridItem.jsx";
-import Button from "components/CustomButtons/Button.jsx";
+import {Footer, GridContainer, GridItem, Button} from '../../components';
 
 import landingPageStyle from "assets/jss/material-kit-react/views/landingPage.jsx";
 import img from "assets/img/landing-bg.jpg";

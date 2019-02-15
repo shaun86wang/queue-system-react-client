@@ -27,5 +27,5 @@ CardBody.propTypes = {
   classes: PropTypes.object.isRequired,
   className: PropTypes.string
 };
-
-export default withStyles(cardBodyStyle)(CardBody);
+let cardBodyWithStyle = withStyles(cardBodyStyle)(CardBody);
+export {cardBodyWithStyle as CardBody} 
