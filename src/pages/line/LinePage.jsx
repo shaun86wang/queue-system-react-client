@@ -1,12 +1,14 @@
 import React from "react";
-//import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 
-// @material-ui/icons
+import {studentActions} from '../../actions'
+
+import {history} from '../../helpers'
 
 // core components
-import { GridContainer, GridItem, Button, CustomInput } from '../../components';
+import { GridContainer, GridItem, Button, CustomInput} from '../../components';
 
 import landingPageStyle from "assets/jss/material-kit-react/views/landingPage.jsx";
 
@@ -16,15 +18,26 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import FormControl from '@material-ui/core/FormControl';
+import Select from '@material-ui/core/Select';
+
 class LinePage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
+      type: 0
     }
   }
   handleClickOpen = () => {
-    this.setState({ open: true });
+    if(this.props.user){
+      this.setState({ open: true });
+
+    }else{
+      history.push('./login');
+    }
   };
 
   handleClose = () => {
@@ -34,6 +47,20 @@ class LinePage extends React.Component {
   handleChange = (e) => {
     const { id, value } = e.target;
     this.setState({ [id]: value });
+  }
+
+  handleSelectChange = (e) =>{
+    this.setState({ [e.target.name]: e.target.value });
+  }
+
+  handleSubmit = () => {
+    this.handleClose();
+    const {dispatch, user} = this.props;
+    dispatch(studentActions.addStudent(
+        user.email,
+        this.state.type,
+        this.state.description
+    ));
   }
 
   render() {
@@ -65,9 +92,27 @@ class LinePage extends React.Component {
               <DialogContentText>
                 In order to get in line, please decribe the type of package you are retrieving.
             </DialogContentText>
+            <br></br>
+              <FormControl required style={{width:'100%'}}>
+                <InputLabel htmlFor="type">Service Type</InputLabel>
+                <Select
+                  value={this.state.type}
+                  onChange={this.handleSelectChange}
+                  name="type"
+                  inputProps={{
+                    id: 'type',
+                  }}
+                  color="error"
+                >
+                  <MenuItem value={0}>Retrieve Package</MenuItem>
+                  <MenuItem value={1}>Send Package</MenuItem>
+                  <MenuItem value={2}>Other Services</MenuItem>
+                </Select>
+              </FormControl>
               <CustomInput
-                labelText='Description'
+                labelText='Description*'
                 id='description'
+                
                 formControlProps={{
                   fullWidth: true
                 }}
@@ -75,7 +120,8 @@ class LinePage extends React.Component {
                 inputProps={{
                   type: 'text',
                   onChange: this.handleChange,
-                  required: true
+                  required: true,
+                  value : this.state.description
                 }}
               />
             </DialogContent>
@@ -83,7 +129,7 @@ class LinePage extends React.Component {
               <Button onClick={this.handleClose} color="danger">
                 Cancel
             </Button>
-              {this.state.description && <Button onClick={this.handleClose} color="danger">
+              {this.state.description && <Button onClick={this.handleSubmit} color="danger">
                 Submit
             </Button>}
             </DialogActions>
@@ -95,5 +141,12 @@ class LinePage extends React.Component {
     );
   }
 }
-const connectedLinePageWithStyle = withStyles(landingPageStyle)(LinePage);
+
+function mapStateToProps(state){
+  const {user} = state.authentication;
+  return {user};
+}
+
+
+const connectedLinePageWithStyle = connect(mapStateToProps)(withStyles(landingPageStyle)(LinePage));
 export { connectedLinePageWithStyle as LinePage }

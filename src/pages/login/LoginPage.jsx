@@ -43,7 +43,6 @@ class LoginPage extends React.Component {
 
   handleSubmit = (e) => {
     e.preventDefault();
-    console.log("submitting");
     const {email, password} = this.state;
     //TODO: Add email validation
     if(email && password){
