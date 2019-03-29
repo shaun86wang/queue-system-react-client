@@ -7,10 +7,11 @@ import Icon from '@material-ui/core/Icon';
 // @material-ui/icons
 import Email from '@material-ui/icons/Email';
 // core components
-import {GridContainer, GridItem, Button, Card, CardBody, CardHeader, CardFooter, CustomInput} from '../../components';
+import { GridContainer, GridItem, Button, Card, CardBody, CardHeader, CardFooter, CustomInput } from '../../components';
 
 import loginPageStyle from 'assets/jss/material-kit-react/views/loginPage.jsx';
 
+import { accountActions, alertActions } from '../../actions'
 
 class SignUpPage extends React.Component {
   constructor(props) {
@@ -22,167 +23,194 @@ class SignUpPage extends React.Component {
       lastName: '',
       password: '',
       confirm: '',
-      studentNumber:'',
-      email:''
+      studentNumber: '',
+      email: ''
     };
   }
   componentDidMount() {
     // we add a hidden class to the card and after 700 ms we delete it and the transition appears
     setTimeout(
-      function() {
+      function () {
         this.setState({ cardAnimaton: '' });
       }.bind(this),
       700
     );
   }
 
-  handleChange = (e) =>{
-    const {id, value} = e.target;
-    this.setState({[id]: value});
+  handleChange = (e) => {
+    const { id, value } = e.target;
+    this.setState({ [id]: value });
   }
 
-  render() {
-    const { classes} = this.props;
-    return (
-      <GridContainer justify='center'>
-      <GridItem xs={12} sm={12} md={4}>
-        <Card className={classes[this.state.cardAnimaton]}>
-          <form className={classes.form}>
-            <CardHeader color='primary' className={classes.cardHeader}>
-              <h4>Register</h4>
-              </CardHeader>
-            <CardBody>
-              <CustomInput
-                labelText='Email...'
-                id='email'
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  type: 'email',
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <Email className={classes.inputIconsColor} />
-                    </InputAdornment>
-                  ),
-                  onChange:this.handleChange,
-                  required: true
-                }}
-              />
-              <CustomInput
-                labelText='Password'
-                id='password'
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  type: 'password',
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <Icon className={classes.inputIconsColor}>
-                        lock_outline
-                      </Icon>
-                    </InputAdornment>
-                  ),
-                  onChange:this.handleChange,
-                  required: true
-                }}
-              />
-              <CustomInput
-                labelText='Confirm Password'
-                id='confirm'
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  type: 'password',
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <Icon className={classes.inputIconsColor}>
-                        lock_outline
-                      </Icon>
-                    </InputAdornment>
-                  ),
-                  onChange:this.handleChange,
-                  required: true
-                }}
-              />
-              <CustomInput
-                labelText='First Name'
-                id='firstName'
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  type: 'text',
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <Icon className={classes.inputIconsColor}>
-                      perm_identity
-                      </Icon>
-                    </InputAdornment>
-                  ),
-                  onChange:this.handleChange,
-                  required: true
-                }}
-              />
-              <CustomInput
-                labelText='Last Name'
-                id='lastName'
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  type: 'text',
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <Icon className={classes.inputIconsColor}>
-                      perm_identity
-                      </Icon>
-                    </InputAdornment>
-                  ),
-                  onChange:this.handleChange,
-                  required: true
-                }}
-              />
-              <CustomInput
-                labelText='Student Number'
-                id='studentNumber'
-                formControlProps={{
-                  fullWidth: true
-                }}
-                inputProps={{
-                  type: 'text',
-                  endAdornment: (
-                    <InputAdornment position='end'>
-                      <Icon className={classes.inputIconsColor}>
-                        assignment_ind
-                      </Icon>
-                    </InputAdornment>
-                  ),
-                  onChange:this.handleChange,
-                  required: true
-                }}
-              />
-            </CardBody>
-            <CardFooter className={classes.cardFooter}>
-              <Button simple color='primary' size='lg'>
-                Register
-              </Button>
-            </CardFooter>
-          </form>
-        </Card>
-      </GridItem>
-    </GridContainer>
-    );
+  handleSubmit = (e) => {
+    e.preventDefault();
+    const { dispatch } = this.props;
+    dispatch(alertActions.clear());
+    if(this.state.password !== this.state.confirm){
+      dispatch(alertActions.error("Password confirmation should match password"));
+      return;
+    }
+    if(this.state.password.length < 6){
+      dispatch(alertActions.error("Password should be at least 6 characters"));
+      return;
+    }
+    this.setState({ submitted: true });
+    const user = {
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      password: this.state.password,
+      studentNumber: this.state.studentNumber,
+      email: this.state.email
+    }
+    console.log(JSON.stringify(user));
+    if (user.firstName && user.lastName && user.email && user.password) {
+      dispatch(accountActions.signUp(user));
+      
+    }
   }
-}
-function mapStateToProps(state){
-  const {registering}  = state.registration;
-  return{
+
+    render() {
+      const { classes } = this.props;
+      return (
+        <GridContainer justify='center'>
+          <GridItem xs={12} sm={12} md={4}>
+            <Card className={classes[this.state.cardAnimaton]}>
+              <form className={classes.form}>
+                <CardHeader color='primary' className={classes.cardHeader}>
+                  <h4>Register</h4>
+                </CardHeader>
+                <CardBody>
+                  <CustomInput
+                    labelText='Email...'
+                    id='email'
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                    inputProps={{
+                      type: 'email',
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <Email className={classes.inputIconsColor} />
+                        </InputAdornment>
+                      ),
+                      onChange: this.handleChange,
+                      required: true
+                    }}
+                  />
+                  <CustomInput
+                    labelText='Password'
+                    id='password'
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                    inputProps={{
+                      type: 'password',
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <Icon className={classes.inputIconsColor}>
+                            lock_outline
+                      </Icon>
+                        </InputAdornment>
+                      ),
+                      onChange: this.handleChange,
+                      required: true
+                    }}
+                  />
+                  <CustomInput
+                    labelText='Confirm Password'
+                    id='confirm'
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                    inputProps={{
+                      type: 'password',
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <Icon className={classes.inputIconsColor}>
+                            lock_outline
+                      </Icon>
+                        </InputAdornment>
+                      ),
+                      onChange: this.handleChange,
+                      required: true
+                    }}
+                  />
+                  <CustomInput
+                    labelText='First Name'
+                    id='firstName'
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                    inputProps={{
+                      type: 'text',
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <Icon className={classes.inputIconsColor}>
+                            perm_identity
+                      </Icon>
+                        </InputAdornment>
+                      ),
+                      onChange: this.handleChange,
+                      required: true
+                    }}
+                  />
+                  <CustomInput
+                    labelText='Last Name'
+                    id='lastName'
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                    inputProps={{
+                      type: 'text',
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <Icon className={classes.inputIconsColor}>
+                            perm_identity
+                      </Icon>
+                        </InputAdornment>
+                      ),
+                      onChange: this.handleChange,
+                      required: true
+                    }}
+                  />
+                  <CustomInput
+                    labelText='Student Number'
+                    id='studentNumber'
+                    formControlProps={{
+                      fullWidth: true
+                    }}
+                    inputProps={{
+                      type: 'text',
+                      endAdornment: (
+                        <InputAdornment position='end'>
+                          <Icon className={classes.inputIconsColor}>
+                            assignment_ind
+                      </Icon>
+                        </InputAdornment>
+                      ),
+                      onChange: this.handleChange,
+                      required: true
+                    }}
+                  />
+                </CardBody>
+                <CardFooter className={classes.cardFooter}>
+                  <Button simple color='primary' size='lg' onClick={this.handleSubmit}>
+                    Register
+              </Button>
+                </CardFooter>
+              </form>
+            </Card>
+          </GridItem>
+        </GridContainer>
+      );
+    }
+  }
+function mapStateToProps(state) {
+  const { registering } = state.registration;
+  return {
     registering
   }
 }
 
 const connectedSignUpPageWithStyle = connect(mapStateToProps)(withStyles(loginPageStyle)(SignUpPage));
-export {connectedSignUpPageWithStyle as SignUpPage}
+export { connectedSignUpPageWithStyle as SignUpPage }

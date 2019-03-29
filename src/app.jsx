@@ -6,7 +6,7 @@ import { history } from './helpers';
 
 import { alertActions } from './actions';
 
-import { Header, HeaderLinks, SnackbarContent, ClearFix, Footer, PrivateRoute} from './components'
+import { Header, HeaderLinks, SnackbarContent, ClearFix, Footer} from './components'
 
 
 import "assets/scss/material-kit-react.css";
@@ -50,7 +50,7 @@ class App extends React.Component {
                 <Route exact path="/" component={LinePage} />
                 <Route path="/login" component={LoginPage} />
                 <Route path="/signUp" component={SignUpPage} />
-                <PrivateRoute path="/station" component={StationPage} />
+                <Route path="/station" component={StationPage} />
               </div>
             </Router>
             <Footer></Footer>
@@ -104,7 +104,8 @@ const style = {
     position: "relative",
     paddingTop: "20vh",
     color: "#FFFFFF",
-    paddingBottom: "20vh"
+    paddingBottom: "20vh",
+    minHeight: "90vh"
   },
   paddingBottom: {
     paddingBottom: "10vh"

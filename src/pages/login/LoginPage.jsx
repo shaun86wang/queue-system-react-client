@@ -19,11 +19,11 @@ class LoginPage extends React.Component {
   constructor(props) {
     super(props);
     // we use this to make the card to appear after the page has been rendered
+    this.props.dispatch(accountActions.logout());
     this.state = {
       cardAnimaton: 'cardHidden',
       email: '',
       password: ''
-
     };
   }
   componentDidMount() {
@@ -49,6 +49,10 @@ class LoginPage extends React.Component {
     if(email && password){
       this.props.dispatch(accountActions.login(email, password));
     }
+  }
+
+  handleRegister = () => {
+    history.push("/signUp");
   }
   render() {
     const { classes } = this.props;
@@ -104,11 +108,8 @@ class LoginPage extends React.Component {
                 <Button simple color='primary' size='lg' onClick={this.handleSubmit}>
                   Submit
                       </Button>
-                      <Button simple color='info' size='lg' onClick={history.push('/signUp')}>
-                  Register
-                      </Button>
               </CardFooter>
-              <Button block={true} link={true} color='primary' size='sm' type='button'>Do not have an account? Register here!</Button>
+              <Button block={true} link={true} color='primary' size='sm' type='button' onClick={this.handleRegister} >Do not have an account? Register here!</Button>
             </form>
           </Card>
         </GridItem>
@@ -118,7 +119,7 @@ class LoginPage extends React.Component {
 }
 function mapStateToProps(state){
   const {loggingIn} = state.authentication;
-  return{loggingIn};
+  return {loggingIn};
 }
 
 const connectedLoginPageWithStyles = connect(mapStateToProps)(withStyles(loginPageStyle)(LoginPage));

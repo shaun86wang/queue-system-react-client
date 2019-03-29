@@ -15,9 +15,13 @@ function login(username, password) {
 
         accountService.login(username, password)
             .then(
-                user => { 
-                    dispatch(success(user));
-                    history.push('/station');
+                () => {
+                    accountService.getUserDetails(username)
+                        .then(user => {
+                            console.log(user);
+                            dispatch(success(user));
+                            history.push('/');
+                        })
                 },
                 error => {
                     dispatch(failure(error.toString()));
@@ -39,10 +43,10 @@ function logout() {
 function signUp(user) {
     return dispatch => {
         dispatch(request(user));
-
+        console.log("Here");
         accountService.signUp(user)
             .then(
-                () => { 
+                () => {
                     dispatch(success());
                     history.push('/login');
                     dispatch(alertActions.success('Registration successful'));

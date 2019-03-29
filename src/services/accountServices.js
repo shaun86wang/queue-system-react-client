@@ -4,7 +4,8 @@ import config from 'config';
 export const accountService = {
     login,
     logout,
-    signUp
+    signUp,
+    getUserDetails
 };
 
 function login(email, password) {
@@ -24,9 +25,20 @@ function login(email, password) {
         });
 }
 
+function getUserDetails(email){
+    return fetch(`${config.apiUrl}/account/getUserDetails/${email}`)
+    .then(handleResponse)
+    .then(res =>{
+        localStorage.setItem('user', JSON.stringify(res));
+        return res;
+    })
+}
+
 function logout() {
     // remove user from local storage to log user out
     localStorage.removeItem('jwt');
+    localStorage.removeItem('user');
+    localStorage.removeItem('email');
 }
 
 
@@ -39,6 +51,7 @@ function signUp(user) {
 
     return fetch(`${config.apiUrl}/account/signup`, requestOptions).then(handleResponse);
 }
+
 
 
 function handleResponse(response) {

@@ -1,5 +1,6 @@
 /*eslint-disable*/
 import React from "react";
+import { connect } from 'react-redux';
 // react components for routing our app without refresh
 import { Link } from "react-router-dom";
 
@@ -13,26 +14,45 @@ import Tooltip from "@material-ui/core/Tooltip";
 import { Apps, CloudDownload } from "@material-ui/icons";
 
 // core components
-import {Button} from "../";
+import { Button } from "../";
 
 import headerLinksStyle from "assets/jss/material-kit-react/components/headerLinksStyle.jsx";
 
 function HeaderLinks({ ...props }) {
-  const { classes } = props;
+  const { classes, user } = props;
   return (
     <List className={classes.list}>
       <ListItem className={classes.listItem}>
-        <Button
-          href="https://www.creative-tim.com/product/material-kit-react"
+
+        {!user && <Button
           color="transparent"
-          target="_blank"
           className={classes.navLink}
+          href='/login'
         >
-          <CloudDownload className={classes.icons} /> Download
+          Login
+        </Button>}
+
+        {user &&
+          <div>
+            Welcome, {user.studentName}
+            <Button
+              color="transparent"
+              className={classes.navLink}
+              href='/login'
+            >
+              Log Out
         </Button>
+          </div>
+        }
       </ListItem>
     </List>
   );
 }
-let headerLinkswithStype = withStyles(headerLinksStyle)(HeaderLinks)
-export {headerLinkswithStype as HeaderLinks} ;
+function mapStateToProps(state) {
+  const { user } = state.authentication;
+  return {
+    user
+  }
+}
+let connectedHeaderLinkswithStype = connect(mapStateToProps)(withStyles(headerLinksStyle)(HeaderLinks));
+export { connectedHeaderLinkswithStype as HeaderLinks };
