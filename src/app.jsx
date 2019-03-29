@@ -1,5 +1,5 @@
 import React from "react";
-import { Router, Route } from "react-router-dom";
+import { Router, Route, Switch } from "react-router-dom";
 import { connect } from 'react-redux';
 import {StationPage, LoginPage, SignUpPage, LinePage, ErrorPage} from './pages'
 import { history } from './helpers';
@@ -46,13 +46,13 @@ class App extends React.Component {
             </div>}
             <ClearFix />
             <Router history={history}>
-              <div>
+              <Switch>
                 <Route exact path="/" component={LinePage} />
                 <Route path="/login" component={LoginPage} />
                 <Route path="/signUp" component={SignUpPage} />
                 <Route path="/station" component={StationPage} />
-                <Route path="/*" component={ErrorPage} />
-              </div>
+                <Route component={ErrorPage} />
+              </Switch>
             </Router>
             <Footer></Footer>
           </div>
