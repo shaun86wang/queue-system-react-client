@@ -7,6 +7,8 @@ import {studentActions} from '../../actions'
 
 import {history} from '../../helpers'
 
+import {studentService} from '../../services'
+
 // core components
 import { GridContainer, GridItem, Button, CustomInput} from '../../components';
 
@@ -30,6 +32,10 @@ class LinePage extends React.Component {
       open: false,
       type: 0
     }
+  }
+
+  componentDidMount(){
+    studentService.getWaitingStudentsCount().then(count => {this.setState({count});});
   }
   handleClickOpen = () => {
     if(this.props.user){
@@ -65,13 +71,14 @@ class LinePage extends React.Component {
 
   render() {
     const { classes } = this.props;
+    const {count, open, type, description } = this.state;
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={6}>
           <h1 className={classes.title}>Estimated Wait Time: 10 minutes</h1>
-          <h2>
-            2 students in line.
-        </h2>
+          {count && <h2>
+            {count} students in line.
+        </h2>}
           <br />
           <Button
             color="danger"
@@ -83,7 +90,7 @@ class LinePage extends React.Component {
             <i className="fas fa-angle-right" />   Get in line
         </Button>
           <Dialog
-            open={this.state.open}
+            open={open}
             onClose={this.handleClose}
             aria-labelledby="form-dialog-title"
           >
@@ -96,7 +103,7 @@ class LinePage extends React.Component {
               <FormControl required style={{width:'100%'}}>
                 <InputLabel htmlFor="type">Service Type</InputLabel>
                 <Select
-                  value={this.state.type}
+                  value={type}
                   onChange={this.handleSelectChange}
                   name="type"
                   inputProps={{
@@ -121,7 +128,7 @@ class LinePage extends React.Component {
                   type: 'text',
                   onChange: this.handleChange,
                   required: true,
-                  value : this.state.description
+                  value : description
                 }}
               />
             </DialogContent>
@@ -129,7 +136,7 @@ class LinePage extends React.Component {
               <Button onClick={this.handleClose} color="danger">
                 Cancel
             </Button>
-              {this.state.description && <Button onClick={this.handleSubmit} color="danger">
+              {description && <Button onClick={this.handleSubmit} color="danger">
                 Submit
             </Button>}
             </DialogActions>

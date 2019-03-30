@@ -1,7 +1,8 @@
 import config from 'config';
 
 export const studentService = {
-    addStudent
+    addStudent,
+    getWaitingStudentsCount
 }
 
 const postRequestOptions = {
@@ -16,6 +17,10 @@ function addStudent(email, serviceType, description) {
         .then(res => {
             return res;
         });
+}
+
+function getWaitingStudentsCount(){
+    return fetch(`${config.apiUrl}/student/getWaitingStudentsCount`).then(handleResponse);
 }
 
 function handleResponse(response) {
