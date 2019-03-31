@@ -2,7 +2,10 @@ import config from 'config';
 
 export const studentService = {
     addStudent,
-    getWaitingStudentsCount
+    getWaitingStudentsCount,
+    getStudentInfo,
+    updateDescription,
+    cancelStudent
 }
 
 const postRequestOptions = {
@@ -13,14 +16,28 @@ const postRequestOptions = {
 function addStudent(email, serviceType, description) {
     const requestOptions = { ...postRequestOptions, body: JSON.stringify({ email, serviceType, description }) };
     return fetch(`${config.apiUrl}/student/addStudent`, requestOptions)
-        .then(handleResponse)
-        .then(res => {
-            return res;
-        });
+        .then(handleResponse);
 }
 
 function getWaitingStudentsCount(){
     return fetch(`${config.apiUrl}/student/getWaitingStudentsCount`).then(handleResponse);
+}
+
+function getStudentInfo(email){
+    return fetch(`${config.apiUrl}/student/getStudentInfo/${email}`).then(handleResponse);
+}
+
+function updateDescription(id, description){
+    const requestOptions = { ...postRequestOptions, body: JSON.stringify({ id,  description }) };
+    return fetch(`${config.apiUrl}/student/updateDescription`, requestOptions)
+        .then(handleResponse);
+}
+
+function cancelStudent(id){
+    console.log("Cancel stuent with id: " + id);
+    return fetch(`${config.apiUrl}/student/cancelStudent/${id}`, {method:'PUT'})
+    .then(handleResponse);
+
 }
 
 function handleResponse(response) {

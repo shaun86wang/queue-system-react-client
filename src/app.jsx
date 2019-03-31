@@ -1,7 +1,7 @@
 import React from "react";
 import { Router, Route, Switch } from "react-router-dom";
 import { connect } from 'react-redux';
-import {StationPage, LoginPage, SignUpPage, LinePage, ErrorPage} from './pages'
+import {StationPage, LoginPage, SignUpPage, LinePage, ErrorPage, WaitPage} from './pages'
 import { history } from './helpers';
 
 import { alertActions } from './actions';
@@ -50,6 +50,7 @@ class App extends React.Component {
                 <Route exact path="/" component={LinePage} />
                 <Route path="/login" component={LoginPage} />
                 <Route path="/signUp" component={SignUpPage} />
+                <Route path="/wait" component={WaitPage} />
                 <Route path="/station" component={StationPage} />
                 <Route component={ErrorPage} />
               </Switch>

@@ -18,7 +18,6 @@ function login(username, password) {
                 () => {
                     accountService.getUserDetails(username)
                         .then(user => {
-                            console.log(user);
                             dispatch(success(user));
                             history.push('/');
                         })
@@ -43,7 +42,6 @@ function logout() {
 function signUp(user) {
     return dispatch => {
         dispatch(request(user));
-        console.log("Here");
         accountService.signUp(user)
             .then(
                 () => {

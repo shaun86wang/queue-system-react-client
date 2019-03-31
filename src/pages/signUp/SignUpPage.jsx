@@ -62,7 +62,6 @@ class SignUpPage extends React.Component {
       studentNumber: this.state.studentNumber,
       email: this.state.email
     }
-    console.log(JSON.stringify(user));
     if (user.firstName && user.lastName && user.email && user.password) {
       dispatch(accountActions.signUp(user));
       

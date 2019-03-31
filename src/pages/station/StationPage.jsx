@@ -41,14 +41,14 @@ class StationPage extends React.Component {
 
         <Card className={classes.lineCard}>
           <CardHeader color="info" className={classes.lineCardHeader}>
-            <h4><Timer className={classes.timerIcon} />       Line</h4>
+            <h4><Timer className={classes.timerIcon} />Line</h4>
           </CardHeader>
           <CardBody className={classes.textCenter}>
             <GridContainer justify="flex-start">
               {
                 this.state.students.map((s, i) => {
                   return (
-                    <GridItem xs={1} key={i}>
+                    <GridItem xs={12} sm={3} lg={1} key={i}>
                       <Button color="info">
                         {s}
                       </Button>
@@ -98,9 +98,7 @@ const style = {
   },
   timerIcon: { 
     fontSize: 30, 
-    marginBottom: "-1vh", 
-    marginLeft: "-50px", 
-    marginRight: "20px" 
+    marginBottom: "-1vh"
   }
 }
 const connectedStationPageWithStyle = withStyles(style)(StationPage);

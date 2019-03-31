@@ -3,14 +3,14 @@ import { connect } from 'react-redux';
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
 
-import {studentActions} from '../../actions'
+import { alertActions } from '../../actions'
 
-import {history} from '../../helpers'
+import { history } from '../../helpers'
 
-import {studentService} from '../../services'
+import { studentService } from '../../services'
 
 // core components
-import { GridContainer, GridItem, Button, CustomInput} from '../../components';
+import { GridContainer, GridItem, Button, CustomInput } from '../../components';
 
 import landingPageStyle from "assets/jss/material-kit-react/views/landingPage.jsx";
 
@@ -30,18 +30,19 @@ class LinePage extends React.Component {
     super(props);
     this.state = {
       open: false,
-      type: 0
+      type: 0,
+      description: ''
     }
   }
 
-  componentDidMount(){
-    studentService.getWaitingStudentsCount().then(count => {this.setState({count});});
+  componentDidMount() {
+    studentService.getWaitingStudentsCount().then(count => { this.setState({ count }); });
   }
   handleClickOpen = () => {
-    if(this.props.user){
+    if (this.props.user) {
       this.setState({ open: true });
 
-    }else{
+    } else {
       history.push('./login');
     }
   };
@@ -55,23 +56,29 @@ class LinePage extends React.Component {
     this.setState({ [id]: value });
   }
 
-  handleSelectChange = (e) =>{
+  handleSelectChange = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   }
 
   handleSubmit = () => {
     this.handleClose();
-    const {dispatch, user} = this.props;
-    dispatch(studentActions.addStudent(
-        user.email,
-        this.state.type,
-        this.state.description
-    ));
+    const { user, dispatch } = this.props;
+    const {type, description} = this.state;
+    studentService.addStudent(user.email, type, description)
+      .then(
+        res => {
+          dispatch(alertActions.success(res.message));
+          setTimeout(() => { history.push("/wait");}, 2000 );
+        },
+        error => {
+          dispatch(alertActions.error(error.toString()));
+        }
+      );
   }
 
   render() {
     const { classes } = this.props;
-    const {count, open, type, description } = this.state;
+    const { count, open, type, description } = this.state;
     return (
       <GridContainer>
         <GridItem xs={12} sm={12} md={6}>
@@ -99,8 +106,8 @@ class LinePage extends React.Component {
               <DialogContentText>
                 In order to get in line, please decribe the type of package you are retrieving.
             </DialogContentText>
-            <br></br>
-              <FormControl required style={{width:'100%'}}>
+              <br></br>
+              <FormControl required style={{ width: '100%' }}>
                 <InputLabel htmlFor="type">Service Type</InputLabel>
                 <Select
                   value={type}
@@ -119,7 +126,7 @@ class LinePage extends React.Component {
               <CustomInput
                 labelText='Description*'
                 id='description'
-                
+
                 formControlProps={{
                   fullWidth: true
                 }}
@@ -128,7 +135,7 @@ class LinePage extends React.Component {
                   type: 'text',
                   onChange: this.handleChange,
                   required: true,
-                  value : description
+                  value: description
                 }}
               />
             </DialogContent>
@@ -149,9 +156,9 @@ class LinePage extends React.Component {
   }
 }
 
-function mapStateToProps(state){
-  const {user} = state.authentication;
-  return {user};
+function mapStateToProps(state) {
+  const { user } = state.authentication;
+  return { user };
 }
 
 

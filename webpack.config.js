@@ -1,4 +1,5 @@
 const HtmlWebPackPlugin = require("html-webpack-plugin");
+var ManifestPlugin = require('webpack-manifest-plugin');
 const webpack = require('webpack');
 const path = require('path');
 module.exports = {
@@ -38,7 +39,8 @@ module.exports = {
     new HtmlWebPackPlugin({
       template: "./src/index.html",
       filename: "./index.html"
-    })
+    }),
+    new ManifestPlugin()
   ],
   resolve: {
     modules: ['src', 'node_modules'],
