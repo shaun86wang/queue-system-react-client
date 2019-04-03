@@ -2,10 +2,11 @@ import React from "react";
 import { connect } from 'react-redux';
 // @material-ui/core components
 import withStyles from "@material-ui/core/styles/withStyles";
+import config from 'config';
 
 import { alertActions } from '../../actions'
 
-import { history } from '../../helpers'
+import { history, stomp } from '../../helpers'
 
 import { studentService } from '../../services'
 
@@ -25,9 +26,6 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
-import { configConstants } from '../../constants'
-import { Stomp } from 'stompjs/lib/stomp.js'
-import SockJS from 'sockjs-client'
 
 class LinePage extends React.Component {
   constructor(props) {
@@ -35,21 +33,37 @@ class LinePage extends React.Component {
     this.state = {
       open: false,
       type: 0,
-      description: ''
+      description: '',
+      count: -1
     }
+    this.stompClient = stomp.getStompClient(config.websocketUrl);
   }
 
   componentDidMount() {
     if (this.props.user) {
       studentService.getStudentInfo(this.props.user.email)
         .then(info => {
-          if (info.status === 'INLINE') { history.push('/wait'); }
+          if (info.status === 'INLINE' || info.status === 'WAITING') { history.push('/wait'); }
           else {
-            studentService.getWaitingStudentsCount().then(count => { this.setState({ count }); });
+            this.setupCountUpdate();
           }
         });
+    } else {
+      this.setupCountUpdate();
     }
   }
+
+  setupCountUpdate(){
+    studentService.getWaitingStudentsCount().then(count => { this.setState({ count }); });
+    this.stompClient.connect({}, () => {
+      this.stompClient.subscribe('/clientSocket/getInlineStudents', message => {
+        if(this.state.pauseRefresh){return;}
+          const count = message.body.substr(0, message.body.indexOf(':'));
+          this.setState({ count: +count});
+      })
+  });
+  }
+
   handleClickOpen = () => {
     if (this.props.user) {
       this.setState({ open: true });
@@ -80,11 +94,12 @@ class LinePage extends React.Component {
       .then(
         res => {
           dispatch(alertActions.success(res.message));
-          const socket = new SockJS(configConstants.serverUrl + 'websocket/');
-          this.stompClient = Stomp.over(socket);
+          this.setState({pauseRefresh: true});
           
-          this.stompClient.connect({}, ()=>{this.stompClient.send('/getInlineStudents');});
-          setTimeout(() => { history.push("/wait"); }, 2000);
+          setTimeout(() => { 
+          this.stompClient.send('/getInlineStudents');
+          history.push("/wait"); 
+          }, 2000);
         },
         error => {
           dispatch(alertActions.error(error.toString()));
@@ -97,11 +112,12 @@ class LinePage extends React.Component {
     const { count, open, type, description } = this.state;
     return (
       <GridContainer>
+        {count !== -1 &&
         <GridItem xs={12} sm={12} md={6}>
-          <h1 className={classes.title}>Estimated Wait Time: 10 minutes</h1>
-          {count && <h2>
+          <h1 className={classes.title}>Estimated Wait Time: {count * 10} minutes</h1>
+          {count > 0 ? <h2>
             {count} students in line.
-        </h2>}
+        </h2> : <h2>No one is in line</h2>}
           <br />
           <Button
             color="danger"
@@ -165,7 +181,7 @@ class LinePage extends React.Component {
             </DialogActions>
           </Dialog>
         </GridItem>
-      </GridContainer>
+      }</GridContainer>
 
 
     );

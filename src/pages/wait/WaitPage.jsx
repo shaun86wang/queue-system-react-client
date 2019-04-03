@@ -1,12 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import config from 'config';
+
 import withStyles from "@material-ui/core/styles/withStyles";
 
 import { GridContainer, GridItem, Card, CardBody, CardHeader, CardFooter, Button, CustomInput } from '../../components';
 
 import { title } from "assets/jss/material-kit-react.jsx";
 import { studentService } from '../../services';
-import { history } from '../../helpers'
+import { stomp, history } from '../../helpers'
 
 
 import Dialog from '@material-ui/core/Dialog';
@@ -21,27 +23,43 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { alertActions } from '../../actions';
 
-import { configConstants } from '../../constants'
-import { Stomp } from 'stompjs/lib/stomp.js'
-import SockJS from 'sockjs-client'
 
 class WaitPage extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { open: false, serviceType: 0 };
-
+        this.state = { open: false, serviceType: 0, loading: true };
+        this.stompClient = stomp.getStompClient(config.websocketUrl);
     }
     componentDidMount() {
-        studentService.getStudentInfo(this.props.user.email)
-            .then(info => {
-                this.setState({ ...info });
-                if (this.state.status !== 'INLINE') { history.push('/'); }
-                else {
-                    studentService.getWaitingStudentsCount().then(count => { this.setState({ count }); });
-                    this.setState({ oldDescription: this.state.description });
+        if (!this.props.user) {
+            history.push('/');
+        } else {
+            studentService.getStudentInfo(this.props.user.email)
+                .then(info => {
+                    this.setState({ ...info });
+                    if (this.state.status !== 'INLINE' && this.state.status !== 'WAITING') { history.push('/'); }
+                    else {
+                        studentService.getWaitAheadForStudent(this.state.id).then(count => { this.setState({ count }); });
+                        this.setState({ oldDescription: this.state.description });
+                        this.setState({ loading: false });
+                        this.stompClient.connect({}, () => {
+                            this.stompClient.subscribe('/clientSocket/getInlineStudents', () => {
+                                studentService.getStudentInfo(this.props.user.email).then(info => {
+                                    this.setState({ ...info });
+                                    if (this.state.status !== 'INLINE' && this.state.status !== 'WAITING') { history.push('/'); }
+                                    else {
+                                        studentService.getWaitAheadForStudent(this.state.id)
+                                            .then(count => { this.setState({ count }); })
+                                    }
+                                });
 
-                }
-            });
+                            });
+                        });
+
+                    }
+                });
+        }
+
     }
 
     handleLeave = () => {
@@ -49,11 +67,9 @@ class WaitPage extends React.Component {
         studentService.cancelStudent(this.state.id).then(
             res => {
                 dispatch(alertActions.success(res.message));
-                const socket = new SockJS(configConstants.serverUrl + 'websocket/');
-          this.stompClient = Stomp.over(socket);
-          this.stompClient.connect({}, ()=>{this.stompClient.send('/getInlineStudents');});
-          
-                setTimeout(() => { history.push("/") }, 2000);
+                setTimeout(() => {
+                    this.stompClient.send('/getInlineStudents');
+                }, 1000);
             },
             error => {
                 dispatch(alertActions.error(error));
@@ -85,79 +101,83 @@ class WaitPage extends React.Component {
 
     render() {
         const { classes } = this.props;
-        const { count, displayName, oldDescription, description, serviceType, open } = this.state;
+        const { count, displayName, oldDescription, description, serviceType, open, status, loading } = this.state;
         return (
             <GridContainer justify='center'>
-                <GridItem sm={12} md={6}>
-                    <Card className={classes.textCenter}>
-                        <CardHeader color="primary" className={classes.cardHeader}>
-                            {count && <h3 className={classes.title}>You have {count} students in front of you</h3>}
-                        </CardHeader>
-                        <CardBody>
-                            <h4>Estimated wait time is {count} mins</h4>
-                            <h4>Your ticket code is {displayName}</h4>
-                            <h4>Your service description is: {oldDescription} </h4>
+                {!loading &&
+                    <GridItem sm={12} md={6}>
+                        {status == 'WAITING' ? <h1 className={classes.title}>It is your turn!</h1>
+                            :
+                            <Card className={classes.textCenter}>
+                                <CardHeader color="primary" className={classes.cardHeader}>
+                                    {count > 0 ? <h3 className={classes.title}>You have {count} students in front of you</h3> : <h3 className={classes.title}>You are next</h3>}
+                                </CardHeader>
+                                <CardBody>
+                                    <h4>Estimated wait time is {count} mins</h4>
+                                    <h4>Your ticket code is {displayName}</h4>
+                                    <h4>Your service description is: {oldDescription} </h4>
 
-                        </CardBody>
-                        <CardFooter className={classes.cardFooter}>
-                            <Button color='primary' size='lg' onClick={this.handleClickOpen}>Update Description</Button>
-                            <Button simple color='primary' size='lg' onClick={this.handleLeave}>
-                                Leave Line
+                                </CardBody>
+                                <CardFooter className={classes.cardFooter}>
+                                    <Button color='primary' size='lg' onClick={this.handleClickOpen}>Update Description</Button>
+                                    <Button simple color='primary' size='lg' onClick={this.handleLeave}>
+                                        Leave Line
                             </Button></CardFooter>
-                    </Card>
-                    <Dialog
-                        open={open}
-                        onClose={this.handleCancel}
-                        aria-labelledby="form-dialog-title"
-                    >
-                        <DialogTitle id="form-dialog-title">Get in line</DialogTitle>
-                        <DialogContent>
-                            <DialogContentText>
-                                In order to get in line, please decribe the type of package you are retrieving.
+                            </Card>}
+                        <Dialog
+                            open={open}
+                            onClose={this.handleCancel}
+                            aria-labelledby="form-dialog-title"
+                        >
+                            <DialogTitle id="form-dialog-title">Get in line</DialogTitle>
+                            <DialogContent>
+                                <DialogContentText>
+                                    In order to get in line, please decribe the type of package you are retrieving.
             </DialogContentText>
-                            <br></br>
-                            <FormControl required style={{ width: '100%' }}>
-                                <InputLabel htmlFor="serviceType">Service Type</InputLabel>
-                                <Select
-                                    value={serviceType}
-                                    name="serviceType"
-                                    readOnly
-                                    inputProps={{
-                                        id: 'serviceType',
+                                <br></br>
+                                <FormControl required style={{ width: '100%' }}>
+                                    <InputLabel htmlFor="serviceType">Service Type</InputLabel>
+                                    <Select
+                                        value={serviceType}
+                                        name="serviceType"
+                                        readOnly
+                                        inputProps={{
+                                            id: 'serviceType',
+                                        }}
+                                    >
+                                        <MenuItem value={0}>Retrieve Package</MenuItem>
+                                        <MenuItem value={1}>Send Package</MenuItem>
+                                        <MenuItem value={2}>Other Services</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <CustomInput
+                                    labelText='Description*'
+                                    id='description'
+
+                                    formControlProps={{
+                                        fullWidth: true
                                     }}
-                                >
-                                    <MenuItem value={0}>Retrieve Package</MenuItem>
-                                    <MenuItem value={1}>Send Package</MenuItem>
-                                    <MenuItem value={2}>Other Services</MenuItem>
-                                </Select>
-                            </FormControl>
-                            <CustomInput
-                                labelText='Description*'
-                                id='description'
-
-                                formControlProps={{
-                                    fullWidth: true
-                                }}
-                                inputProps={{
-                                    type: 'text',
-                                    onChange: this.handleChange,
-                                    required: true,
-                                    value: description,
-                                    autoFocus: true
-                                }}
-                            />
-                        </DialogContent>
-                        <DialogActions>
-                            <Button onClick={this.handleCancel} color="primary" >
-                                Cancel
+                                    inputProps={{
+                                        type: 'text',
+                                        onChange: this.handleChange,
+                                        required: true,
+                                        value: description,
+                                        autoFocus: true
+                                    }}
+                                />
+                            </DialogContent>
+                            <DialogActions>
+                                <Button onClick={this.handleCancel} color="primary" >
+                                    Cancel
             </Button>
-                            {oldDescription !== description && <Button onClick={this.handleSubmit} color="primary">
-                                Submit
+                                {oldDescription !== description && <Button onClick={this.handleSubmit} color="primary">
+                                    Submit
             </Button>}
-                        </DialogActions>
-                    </Dialog>
+                            </DialogActions>
+                        </Dialog>
 
-                </GridItem>
+                    </GridItem>
+                }
             </GridContainer>
         )
     }

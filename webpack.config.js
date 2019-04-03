@@ -48,7 +48,8 @@ module.exports = {
   },
   externals:{
     config:JSON.stringify({
-      apiUrl: 'http://localhost:5000/api'
+      apiUrl: 'http://localhost:5000/api',
+      websocketUrl: 'http://localhost:5000/websocket'
     })
   }
 };

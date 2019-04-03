@@ -5,7 +5,8 @@ export const studentService = {
     getWaitingStudentsCount,
     getStudentInfo,
     updateDescription,
-    cancelStudent
+    cancelStudent,
+    getWaitAheadForStudent
 }
 
 const postRequestOptions = {
@@ -34,10 +35,13 @@ function updateDescription(id, description){
 }
 
 function cancelStudent(id){
-    console.log("Cancel stuent with id: " + id);
     return fetch(`${config.apiUrl}/student/cancelStudent/${id}`, {method:'PUT'})
     .then(handleResponse);
 
+}
+
+function getWaitAheadForStudent(id){
+    return fetch(`${config.apiUrl}/student/getWaitAheadForStudent/${id}`).then(handleResponse);
 }
 
 function handleResponse(response) {

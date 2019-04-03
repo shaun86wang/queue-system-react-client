@@ -1,76 +1,152 @@
 import React from 'react'
 import { connect } from 'react-redux';
+import config from 'config';
+import {stomp} from '../../helpers'
 
-import { configConstants } from '../../constants'
-import { Stomp } from 'stompjs/lib/stomp.js'
-import SockJS from 'sockjs-client'
 
 import withStyles from "@material-ui/core/styles/withStyles";
 
 import { cardTitle } from "assets/jss/material-kit-react.jsx";
 
-import { GridContainer, GridItem, Card, CardBody, CardHeader, CardFooter, Button } from '../../components';
+import { GridContainer, GridItem, Card, CardBody, CardHeader, CardFooter, Button, CustomInput} from '../../components';
 
 import Timer from "@material-ui/icons/Timer";
 
-import {socketActions} from '../../actions'
+import {alertActions } from '../../actions'
+import { stationServices } from '../../services';
+
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
+
+
 class StationPage extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      students: null
+      students: [],
+      open: false,
+      student:{
+        stationComment:''
+      }
     }
   }
-  connect() {
-    const socket = new SockJS(configConstants.serverUrl + 'websocket/');
-    this.stompClient = Stomp.over(socket);
-    this.props.dispatch(socketActions.socketConnected(this.stompClient));
+
+
+  componentDidMount() {
+    this.stompClient = stomp.getStompClient(config.websocketUrl);
     this.stompClient.connect({}, () => {
-      this.stompClient.subscribe('/clientSocket/getInlineStudents', students => {
-        this.setState({ students: eval(students.body) });
+      this.stompClient.subscribe('/clientSocket/getInlineStudents', message => {
+        let list = eval(message.body.substr(message.body.indexOf(':') + 1));
+        if (list[0] === ''){list = [];}
+        this.setState({ students: list });
+        
       })
+      this.stompClient.send('/getInlineStudents');
     })
   }
 
-  componentDidMount() {
-    this.connect();
-    setTimeout(() => { this.stompClient.send('/getInlineStudents'); }, 5000)
+  handleGetNextStudent = () => {
+    const { dispatch } = this.props;
 
+    stationServices.getNextStudent().then(
+      res => {
+        this.setState({ student: res });
+        this.stompClient.send('/getInlineStudents');
+      },
+      error => {
+        dispatch(alertActions.error(error.toString()));
+      }
+    )
   }
+
+  handleStudentServedClick = () => {
+    this.setState({ open: true });
+  }
+
+  handleClose = () => {
+    this.setState({ open: false });
+  }
+
+  handleStationCommentChange = (e) => {
+    const {value } = e.target;
+    const student = {...this.state.student, stationComment:value};
+    this.setState({ student});
+  }
+
+  handleStudentServedSubmit = () => {
+    this.handleClose();
+    const { dispatch } = this.props;
+    const { student } = this.state;
+
+    stationServices.studentServed(student.id, student.stationComment).then(
+      () => {
+        this.setState({ student: {stationComment:''} });
+        this.stompClient.send('/getInlineStudents');
+      },
+      error => {
+        dispatch(alertActions.error(error.toString()));
+      }
+    )
+  }
+
+  handleStudentAbsent = () => {
+    const { dispatch } = this.props;
+    const { student } = this.state;
+
+    stationServices.studentAbsent(student.id).then(
+      () => {
+        this.setState({ student: {stationComment:''} });
+        this.stompClient.send('/getInlineStudents');
+      },
+      error => {
+        dispatch(alertActions.error(error.toString()));
+      }
+    )
+  }
+
+
 
   render() {
     const { classes } = this.props;
-    const { students } = this.state;
+    const { students, student, open } = this.state;
     return (
       <div>
         <GridContainer justify="center">
-          <GridItem sm={12} md={4}>
+          <GridItem sm={12} md={8} lg={6} xl={4}>
             <Card className={classes.textCenter}>
               <CardHeader color="primary" className={classes.cardHeader}>
-                <h4>Serving Student: ABCD</h4>
+                {student.studentName ? <h4>Serving Student: {student.displayName}</h4> : <h4>Not Serving Student</h4>}
               </CardHeader>
-              <CardBody>
-                <h4 className={classes.cardTitle}>John Doe</h4>
-                <p>Student Number: 20212345</p>
-                <p>Package Description: this is a package</p>
-              </CardBody>
-              <CardFooter className={classes.cardFooter}>
-                <Button simple color="primary" size="lg">
+              {student.studentName ? <CardBody>
+                <h4 className={classes.cardTitle}>{student.studentName}</h4>
+                <p>Student Number: {student.studentNumber}</p>
+                <p>Package Description: {student.description}</p>
+              </CardBody> 
+              : students.length > 0 && <Button className={classes.nextButton} color="primary" size="lg" onClick={this.handleGetNextStudent}>
+                  Get next student
+                      </Button>}
+              {student.studentName && <CardFooter className={classes.cardFooter}>
+                <Button color="primary" size="lg" onClick={this.handleStudentServedClick}>
                   Student Served
                       </Button>
-              </CardFooter>
+                <Button simple color="primary" size="lg" onClick={this.handleStudentAbsent}>
+                  Student Absent
+                      </Button>
+              </CardFooter>}
             </Card>
           </GridItem>
         </GridContainer>
 
-        {students &&
-          <Card className={classes.lineCard}>
+        <Card className={classes.lineCard}>
             <CardHeader color="info" className={classes.lineCardHeader}>
               <h4><Timer className={classes.timerIcon} />Line</h4>
             </CardHeader>
             <CardBody className={classes.textCenter}>
               <GridContainer justify="flex-start">
-                {students.map((s, i) => {
+                {students.length > 0 && students.map((s, i) => {
                   return (
                     <GridItem xs={12} sm={3} lg={1} key={i}>
                       <Button color="info">
@@ -83,7 +159,43 @@ class StationPage extends React.Component {
               </GridContainer>
             </CardBody>
           </Card>
-        } </div>
+        <Dialog
+            open={open}
+            onClose={this.handleClose}
+            aria-labelledby="form-dialog-title"
+          >
+            <DialogTitle id="form-dialog-title">Comment on student service</DialogTitle>
+            <DialogContent>
+              <DialogContentText>
+                Please type in any note or comment on the student you served.
+            </DialogContentText>
+              <br></br>
+              <CustomInput
+                labelText='Comment'
+                id='stationComment'
+
+                formControlProps={{
+                  fullWidth: true
+                }}
+                primary
+                inputProps={{
+                  type: 'text',
+                  onChange: this.handleStationCommentChange,
+                  required: true,
+                  value: student.stationComment
+                }}
+              />
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={this.handleClose} color='primary'>
+                Cancel
+            </Button>
+              <Button onClick={this.handleStudentServedSubmit} color='primary'>
+                Submit
+            </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
     )
   }
 }
@@ -123,10 +235,15 @@ const style = {
   timerIcon: {
     fontSize: 30,
     marginBottom: "-1vh"
+  },
+  nextButton: {
+    width: '50%',
+    margin: 'auto',
+    marginBottom: '5vh'
   }
 }
 
-function mapStateToProps(){
+function mapStateToProps() {
   return {};
 }
 const connectedStationPageWithStyle = connect(mapStateToProps)(withStyles(style)(StationPage));
