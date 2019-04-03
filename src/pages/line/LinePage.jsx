@@ -25,6 +25,10 @@ import MenuItem from '@material-ui/core/MenuItem';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 
+import { configConstants } from '../../constants'
+import { Stomp } from 'stompjs/lib/stomp.js'
+import SockJS from 'sockjs-client'
+
 class LinePage extends React.Component {
   constructor(props) {
     super(props);
@@ -36,7 +40,15 @@ class LinePage extends React.Component {
   }
 
   componentDidMount() {
-    studentService.getWaitingStudentsCount().then(count => { this.setState({ count }); });
+    if (this.props.user) {
+      studentService.getStudentInfo(this.props.user.email)
+        .then(info => {
+          if (info.status === 'INLINE') { history.push('/wait'); }
+          else {
+            studentService.getWaitingStudentsCount().then(count => { this.setState({ count }); });
+          }
+        });
+    }
   }
   handleClickOpen = () => {
     if (this.props.user) {
@@ -63,12 +75,16 @@ class LinePage extends React.Component {
   handleSubmit = () => {
     this.handleClose();
     const { user, dispatch } = this.props;
-    const {type, description} = this.state;
+    const { type, description } = this.state;
     studentService.addStudent(user.email, type, description)
       .then(
         res => {
           dispatch(alertActions.success(res.message));
-          setTimeout(() => { history.push("/wait");}, 2000 );
+          const socket = new SockJS(configConstants.serverUrl + 'websocket/');
+          this.stompClient = Stomp.over(socket);
+          
+          this.stompClient.connect({}, ()=>{this.stompClient.send('/getInlineStudents');});
+          setTimeout(() => { history.push("/wait"); }, 2000);
         },
         error => {
           dispatch(alertActions.error(error.toString()));

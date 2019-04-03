@@ -21,6 +21,10 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import { alertActions } from '../../actions';
 
+import { configConstants } from '../../constants'
+import { Stomp } from 'stompjs/lib/stomp.js'
+import SockJS from 'sockjs-client'
+
 class WaitPage extends React.Component {
     constructor(props) {
         super(props);
@@ -45,6 +49,10 @@ class WaitPage extends React.Component {
         studentService.cancelStudent(this.state.id).then(
             res => {
                 dispatch(alertActions.success(res.message));
+                const socket = new SockJS(configConstants.serverUrl + 'websocket/');
+          this.stompClient = Stomp.over(socket);
+          this.stompClient.connect({}, ()=>{this.stompClient.send('/getInlineStudents');});
+          
                 setTimeout(() => { history.push("/") }, 2000);
             },
             error => {

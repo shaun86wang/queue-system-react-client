@@ -1,4 +1,9 @@
 import React from 'react'
+import { connect } from 'react-redux';
+
+import { configConstants } from '../../constants'
+import { Stomp } from 'stompjs/lib/stomp.js'
+import SockJS from 'sockjs-client'
 
 import withStyles from "@material-ui/core/styles/withStyles";
 
@@ -7,16 +12,35 @@ import { cardTitle } from "assets/jss/material-kit-react.jsx";
 import { GridContainer, GridItem, Card, CardBody, CardHeader, CardFooter, Button } from '../../components';
 
 import Timer from "@material-ui/icons/Timer";
+
+import {socketActions} from '../../actions'
 class StationPage extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      students: ["SF13", "AS43", "FH58", "SU48", "FJ02"]
+      students: null
     }
+  }
+  connect() {
+    const socket = new SockJS(configConstants.serverUrl + 'websocket/');
+    this.stompClient = Stomp.over(socket);
+    this.props.dispatch(socketActions.socketConnected(this.stompClient));
+    this.stompClient.connect({}, () => {
+      this.stompClient.subscribe('/clientSocket/getInlineStudents', students => {
+        this.setState({ students: eval(students.body) });
+      })
+    })
+  }
+
+  componentDidMount() {
+    this.connect();
+    setTimeout(() => { this.stompClient.send('/getInlineStudents'); }, 5000)
+
   }
 
   render() {
     const { classes } = this.props;
+    const { students } = this.state;
     return (
       <div>
         <GridContainer justify="center">
@@ -39,14 +63,14 @@ class StationPage extends React.Component {
           </GridItem>
         </GridContainer>
 
-        <Card className={classes.lineCard}>
-          <CardHeader color="info" className={classes.lineCardHeader}>
-            <h4><Timer className={classes.timerIcon} />Line</h4>
-          </CardHeader>
-          <CardBody className={classes.textCenter}>
-            <GridContainer justify="flex-start">
-              {
-                this.state.students.map((s, i) => {
+        {students &&
+          <Card className={classes.lineCard}>
+            <CardHeader color="info" className={classes.lineCardHeader}>
+              <h4><Timer className={classes.timerIcon} />Line</h4>
+            </CardHeader>
+            <CardBody className={classes.textCenter}>
+              <GridContainer justify="flex-start">
+                {students.map((s, i) => {
                   return (
                     <GridItem xs={12} sm={3} lg={1} key={i}>
                       <Button color="info">
@@ -55,11 +79,11 @@ class StationPage extends React.Component {
                     </GridItem>
                   )
                 })
-              }
-            </GridContainer>
-          </CardBody>
-        </Card>
-      </div>
+                }
+              </GridContainer>
+            </CardBody>
+          </Card>
+        } </div>
     )
   }
 }
@@ -96,10 +120,14 @@ const style = {
     width: "100%",
     marginTop: "10vh"
   },
-  timerIcon: { 
-    fontSize: 30, 
+  timerIcon: {
+    fontSize: 30,
     marginBottom: "-1vh"
   }
 }
-const connectedStationPageWithStyle = withStyles(style)(StationPage);
-export {connectedStationPageWithStyle as StationPage}
+
+function mapStateToProps(){
+  return {};
+}
+const connectedStationPageWithStyle = connect(mapStateToProps)(withStyles(style)(StationPage));
+export { connectedStationPageWithStyle as StationPage }
