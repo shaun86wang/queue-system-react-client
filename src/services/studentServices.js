@@ -14,8 +14,8 @@ const postRequestOptions = {
     headers: { 'Content-Type': 'application/json' }
 }
 
-function addStudent(email, serviceType, description) {
-    const requestOptions = { ...postRequestOptions, body: JSON.stringify({ email, serviceType, description }) };
+function addStudent(email, serviceType, description, phoneNumber) {
+    const requestOptions = { ...postRequestOptions, body: JSON.stringify({ email, serviceType, description, phoneNumber }) };
     return fetch(`${config.apiUrl}/student/addStudent`, requestOptions)
         .then(handleResponse);
 }

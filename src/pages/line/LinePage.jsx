@@ -34,7 +34,8 @@ class LinePage extends React.Component {
       open: false,
       type: 0,
       description: '',
-      count: -1
+      count: -1,
+      phoneNumber: ''
     }
     this.stompClient = stomp.getStompClient(config.websocketUrl);
   }
@@ -89,8 +90,8 @@ class LinePage extends React.Component {
   handleSubmit = () => {
     this.handleClose();
     const { user, dispatch } = this.props;
-    const { type, description } = this.state;
-    studentService.addStudent(user.email, type, description)
+    const { type, description, phoneNumber } = this.state;
+    studentService.addStudent(user.email, type, description, phoneNumber)
       .then(
         res => {
           dispatch(alertActions.success(res.message));
@@ -109,7 +110,7 @@ class LinePage extends React.Component {
 
   render() {
     const { classes } = this.props;
-    const { count, open, type, description } = this.state;
+    const { count, open, type, description, phoneNumber } = this.state;
     return (
       <GridContainer>
         {count !== -1 &&
@@ -168,6 +169,21 @@ class LinePage extends React.Component {
                   onChange: this.handleChange,
                   required: true,
                   value: description
+                }}
+              />
+              <CustomInput
+                labelText='Phone Number (Optional)'
+                id='phoneNumber'
+
+                formControlProps={{
+                  fullWidth: true
+                }}
+                error
+                inputProps={{
+                  type: 'text',
+                  onChange: this.handleChange,
+                  required: false,
+                  value: phoneNumber
                 }}
               />
             </DialogContent>

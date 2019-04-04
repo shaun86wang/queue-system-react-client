@@ -7,9 +7,9 @@ export const studentActions = {
     addStudent
 }
 
-function addStudent(email, serviceType, description){
+function addStudent(email, serviceType, description, phoneNumber){
     return dispatch =>{
-        studentService.addStudent(email, serviceType, description)
+        studentService.addStudent(email, serviceType, description, phoneNumber)
         .then(
             res => {
                 dispatch(alertActions.success(res));
