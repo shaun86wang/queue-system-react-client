@@ -48,7 +48,7 @@ class LinePage extends React.Component {
           else {
             this.setupCountUpdate();
           }
-        });
+        }, ()=> {this.setupCountUpdate();});
     } else {
       this.setupCountUpdate();
     }

@@ -19,7 +19,7 @@ function login(username, password) {
                     accountService.getUserDetails(username)
                         .then(user => {
                             dispatch(success(user));
-                            history.push('/wait');
+                            history.push('/');
                         })
                 },
                 error => {

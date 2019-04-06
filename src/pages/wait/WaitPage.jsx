@@ -113,7 +113,7 @@ class WaitPage extends React.Component {
                                     {count > 0 ? <h3 className={classes.title}>You have {count} students in front of you</h3> : <h3 className={classes.title}>You are next</h3>}
                                 </CardHeader>
                                 <CardBody>
-                                    <h4>Estimated wait time is {count} mins</h4>
+                                    <h4>Estimated wait time is {count*10} mins</h4>
                                     <h4>Your ticket code is {displayName}</h4>
                                     <h4>Your service description is: {oldDescription} </h4>
 
